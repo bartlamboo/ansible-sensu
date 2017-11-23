@@ -1,0 +1,20 @@
+{
+  "checks": {
+    "ssh": {
+      "command": "check-banner.rb",
+      "subscribers": [
+        "ssh"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "ssh": {
+      "command": "check-netstat-tcp.rb",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

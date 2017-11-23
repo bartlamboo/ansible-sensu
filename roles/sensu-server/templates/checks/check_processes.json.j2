@@ -1,0 +1,20 @@
+{
+  "checks": {
+    "processes": {
+      "command": "check-process.rb -w 500 -c 800",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "threads": {
+      "command": "check-threads-count.rb  -w 800 -c 1200",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

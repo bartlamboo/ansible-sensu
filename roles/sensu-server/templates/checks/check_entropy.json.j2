@@ -1,0 +1,12 @@
+{
+  "checks": {
+    "entropy": {
+      "command": "check-entropy.rb",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

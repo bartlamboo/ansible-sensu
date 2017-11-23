@@ -1,0 +1,12 @@
+{
+  "checks": {
+    "uptime": {
+      "command": "check-uptime.rb --uptime 3600",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

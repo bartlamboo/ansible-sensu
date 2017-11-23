@@ -1,0 +1,159 @@
+---
+
+- name: install sensu yum repo
+  yum_repository:
+    baseurl: https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/
+    gpgcheck: no
+    enabled: yes
+    description: sensu repo
+    name: sensu
+    state: present
+
+- name: install epel repo
+  yum:
+    name: epel-release
+    state: installed
+
+- name: install sensu and dependencies
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+   - uchiwa
+   - sensu
+   - redis
+   - jq
+   - curl
+   - rabbitmq-server
+   - erlang
+
+- name: enable and start redis
+  systemd:
+    name: redis
+    state: started
+    enabled: yes
+
+- name: download ssl cert generation tool
+  get_url:
+    url: https://sensuapp.org/docs/latest/tools/ssl_certs.tar
+    dest: /var/tmp
+
+- name: unpack archive
+  unarchive:
+    dest: /var/tmp
+    src: /var/tmp/ssl_certs.tar
+
+- name: check if certificates have already been generated
+  stat: path=/var/tmp/ssl_certs/server
+  register: certificates_ready
+
+- name: generate certificates
+  shell: ./ssl_certs.sh generate
+  args:
+    chdir: /var/tmp/ssl_certs
+  when: certificates_ready.stat.exists == False
+
+- name: create rabbitmq certificate folder
+  file:
+    dest: /etc/rabbitmq/ssl
+    state: directory
+
+- name: copy certificates to rabbitmq
+  copy:
+    src: "/var/tmp/ssl_certs/server/{{ item }}"
+    dest: "/etc/rabbitmq/ssl/{{ item }}"
+  with_items:
+    - cert.pem
+    - key.pem
+  notify: restart rabbitmq
+
+- name: copy certificates to rabbitmq
+  copy:
+    src: "/var/tmp/ssl_certs/sensu_ca/cacert.pem"
+    dest: "/etc/rabbitmq/ssl/"
+  notify: restart rabbitmq
+
+- name: make sure rabbitmq-server is started and enabled
+  service:
+    name: rabbitmq-server
+    state: started
+    enabled: yes
+
+- name: create rabbitmq vhost
+  rabbitmq_vhost:
+    name: /sensu
+    state: present
+
+- name: create correct rabbitmq user
+  rabbitmq_user:
+    user: sensu
+    password: sensu
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
+
+- name: create sensu certificate folder
+  file:
+    dest: /etc/sensu/ssl
+    state: directory
+
+- name: copy certificates to sensu
+  copy:
+    src: "/var/tmp/ssl_certs/client/{{ item }}"
+    dest: "/etc/sensu/ssl/{{ item }}"
+  with_items:
+    - cert.pem
+    - key.pem
+  notify: restart sensu-server
+
+- name: copy sensu rabbitmq configuration
+  template:
+    src: rabbitmq.json.j2
+    dest: /etc/sensu/conf.d/rabbitmq.json
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy sensu redis configuration
+  template:
+    src: redis.json.j2
+    dest: /etc/sensu/conf.d/redis.json
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy sensu api configuration
+  template:
+    src: api.json.j2
+    dest: /etc/sensu/conf.d/api.json
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy uchiwa configuration
+  template:
+    src: uchiwa.json.j2
+    dest: /etc/sensu/uchiwa.json
+    owner: root
+    group: root
+    mode: 0644
+
+- name: copy sensu client configuration
+  template:
+    src: client.json.j2
+    dest: /etc/sensu/conf.d/client.json
+    owner: root
+    group: root
+    mode: 0644
+
+- name: enable and start sensu services
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - sensu-server
+    - sensu-client
+    - sensu-api
+    - uchiwa

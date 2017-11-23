@@ -1,0 +1,12 @@
+{
+  "checks": {
+    "selinux": {
+      "command": "check-selinux.rb",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

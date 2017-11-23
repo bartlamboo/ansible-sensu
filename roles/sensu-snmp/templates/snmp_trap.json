@@ -1,0 +1,13 @@
+{
+  "snmp_trap": {
+    "community": "public",
+    "bind": "0.0.0.0",
+    "port": 162,
+    "result_attributes": {
+      "datacenter": "Sensu"
+    },
+    "result_status_map": [
+      ["authenticationFailure", 0]
+    ]
+  }
+}

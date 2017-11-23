@@ -1,0 +1,20 @@
+{
+  "checks": {
+    "redis-ping": {
+      "command": "check-redis-ping.rb",
+      "subscribers": [
+        "redis"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "redis-info": {
+      "command": "check-redis-info.rb",
+      "subscribers": [
+        "redis"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

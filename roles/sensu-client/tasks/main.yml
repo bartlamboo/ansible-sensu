@@ -1,0 +1,91 @@
+---
+
+- name: check which port are open on the system
+  shell: ss -lnrtu | egrep '*:[0-9]|:::[0-9]' | awk '{ print $5 }' | sed 's/.*://g' | sort -u
+  register: ports
+  changed_when: false
+
+- name: append discovered services to list
+  set_fact:
+    monitored_services: "{{ monitored_services }} + [ '{{ item.name }}' ]"
+    sensu_plugins: "{{ sensu_plugins }} + [ '{{ item.plugin }}' ]"
+  with_items:
+    - "{{ services }}"
+  when: (item.port|string) in ports.stdout_lines
+
+- name: install sensu yum repo
+  yum_repository:
+    baseurl: https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/
+    gpgcheck: no
+    enabled: yes
+    description: sensu repo
+    name: sensu
+    state: present
+
+- name: install sensu and dependencies
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+   - sensu
+   - gcc-c++
+  notify: restart sensu-client
+
+- name: copy sensu client configuration
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/sensu/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart sensu-client
+  with_items:
+    - client.json
+    - rabbitmq.json
+
+- name: install basic sensu-plugins
+  shell: "sensu-install -p {{ item }}"
+  with_items:
+    - cpu-checks
+    - disk-checks
+    - network-checks
+    - filesystem-checks
+    - memory-checks
+    - load-checks
+    - process-checks
+    - ntp
+    - dns
+    - uptime
+    - selinux
+    - entropy-checks
+  register: check_result
+  changed_when: check_result.stdout | search("installing Sensu gem")
+  notify: restart sensu-client
+
+
+- name: install service specific sensu-plugins
+  shell: "sensu-install -p {{ item }}"
+  with_items: "{{ sensu_plugins }}"
+  register: check_result
+  changed_when: check_result.stdout | search("installing Sensu gem")
+  notify: restart sensu-client
+
+# apache mysql ceph redis ntp docker postgres snmp dns memcached mongodb slack rabbitmq ssl systemd disk-checks http ipmi cgroups postfix gluster php-fpm openstack openldap influxdb strongswan uchiwa nginx selinux ldap syslog-ng
+
+- name: install bare metal sensu-plugins
+  shell: "sensu-install -p {{ item }}"
+  with_items:
+    - hardware
+    - environmental-checks
+  when: ansible_virtualization_role == "host"
+  register: check_result
+  changed_when: check_result.stdout | search("installing Sensu gem")
+  notify: restart sensu-client
+
+- name: enable and start sensu services
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - sensu-client

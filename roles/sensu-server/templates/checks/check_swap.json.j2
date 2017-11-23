@@ -1,0 +1,12 @@
+{
+  "checks": {
+    "swap_percent": {
+      "command": "check-swap.rb -w 10 -c 20",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

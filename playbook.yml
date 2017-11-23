@@ -1,0 +1,10 @@
+---
+- hosts: client
+  roles:
+  - sensu-client
+
+- hosts: server
+  roles:
+  - sensu-server
+  - sensu-client
+  - sensu-snmp

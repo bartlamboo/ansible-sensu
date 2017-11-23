@@ -1,0 +1,36 @@
+{
+  "checks": {
+    "cpu_iowait": {
+      "command": "check-cpu.rb --iowait -w 10 -c 20",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "cpu_system": {
+      "command": "check-cpu.rb --system -w 10 -c 20",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "cpu_idle": {
+      "command": "check-cpu.rb --idle --less_than -w 20 -c 10",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "cpu_steal": {
+      "command": "check-cpu.rb --steal -w 1 -c 2",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

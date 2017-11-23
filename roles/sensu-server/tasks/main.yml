@@ -1,0 +1,128 @@
+---
+
+- name: install sensu yum repo
+  yum_repository:
+    baseurl: https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/
+    gpgcheck: no
+    enabled: yes
+    description: sensu repo
+    name: sensu
+    state: present
+
+- name: install epel repo
+  yum:
+    name: epel-release
+    state: installed
+
+- name: install sensu and dependencies
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+   - uchiwa
+   - sensu
+   - redis
+   - jq
+   - curl
+   - rabbitmq-server
+   - erlang
+
+- name: enable and start sensu dependencies
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - redis
+    - rabbitmq-server
+
+- name: create rabbitmq vhost
+  rabbitmq_vhost:
+    name: /sensu
+    state: present
+  notify: restart rabbitmq
+
+- name: create correct rabbitmq user
+  rabbitmq_user:
+    user: sensu
+    password: sensu
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
+  notify: restart rabbitmq
+
+- name: copy sensu configuration
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/sensu/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - rabbitmq.json
+    - redis.json
+    - api.json
+    - handler_slack.json
+  notify: restart sensu-server
+
+- name: copy sensu check configuration
+  template:
+    src: "checks/{{ item }}.j2"
+    dest: "/etc/sensu/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - check_cpu.json
+    - check_dns.json
+    - check_entropy.json
+    - check_filesystem.json
+    - check_http.json
+    - check_load.json
+    - check_memory.json
+    - check_network.json
+    - check_ntp.json
+    - check_processes.json
+    - check_redis.json
+    - check_rabbitmq.json
+    - check_selinux.json
+    - check_swap.json
+    - check_uptime.json
+  notify: restart sensu-server
+
+- name: install sensu handlers
+  shell: "sensu-install -p {{ item }}"
+  with_items:
+    - slack
+  register: check_result
+  changed_when: check_result.stdout | search("installing Sensu gem")
+
+- name: copy uchiwa configuration
+  template:
+    src: uchiwa.json.j2
+    dest: /etc/sensu/uchiwa.json
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart uchiwa
+
+- name: open firewall for rabbitmq and the web interface
+  firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  with_items:
+    - 5672/tcp
+    - 3000/tcp
+
+- name: enable and start sensu services
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - sensu-server
+    - sensu-api
+    - uchiwa

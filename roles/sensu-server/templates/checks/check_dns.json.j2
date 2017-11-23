@@ -1,0 +1,12 @@
+{
+  "checks": {
+    "dns": {
+      "command": "check-dns.rb --domain {{ ansible_fqdn }} --server {{ ansible_dns.nameservers[1] }}",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

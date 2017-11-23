@@ -1,0 +1,15 @@
+{
+  "slack": {
+    "webhook_url": "{{ sensu_slack_hook }}",
+    "dashboard": "http://{{ ansible_default_ipv4.address }}:3000/",
+    "channel": "{{ sensu_slack_channel }}",
+    "icon_url": "https://raw.githubusercontent.com/sensu/sensu-logo/master/sensu1_flat%20white%20bg_png.png",
+    "icon_emoji": ":heavy_exclamation_mark:"
+  },
+  "handlers": {
+    "slack": {
+      "type": "pipe",
+      "command": "/opt/sensu/embedded/bin/handler-slack.rb"
+    }
+  }
+}

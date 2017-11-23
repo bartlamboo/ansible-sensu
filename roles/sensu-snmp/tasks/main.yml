@@ -1,0 +1,26 @@
+---
+- name: install sensu snmp extension
+  shell: "sensu-install -e {{ item }}"
+  with_items:
+    - snmp-trap:0.0.33
+  register: check_result
+  changed_when: check_result.stdout | search("installing Sensu gem")
+  notify: restart sensu-client
+
+- name: allow ruby to open reserved port
+  shell: "setcap cap_net_bind_service=ep {{ item }}"
+  with_items:
+    - /opt/sensu/embedded/bin/ruby
+    - /opt/sensu/embedded/bin/sensu-client
+  notify: restart sensu-client
+
+- name: open firewall for rabbitmq and the web interface
+  firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  with_items:
+    - 162/udp
+
+

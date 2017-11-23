@@ -1,0 +1,36 @@
+{
+  "checks": {
+    "rabbitmq-alive": {
+      "command": "check-rabbitmq-alive.rb",
+      "subscribers": [
+        "rabbitmq"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "rabbitmq-cluster-health": {
+      "command": "check-rabbitmq-cluster-health.rb",
+      "subscribers": [
+        "rabbitmq"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "rabbitmq-messages": {
+      "command": "check-rabbitmq-messages.rb",
+      "subscribers": [
+        "rabbitmq"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "rabbitmq-node-health": {
+      "command": "check-rabbitmq-node-health.rb",
+      "subscribers": [
+        "rabbitmq"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

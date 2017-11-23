@@ -1,0 +1,60 @@
+{
+  "checks": {
+    "http": {
+      "command": "check-http.rb --url http://localhost:80",
+      "subscribers": [
+        "http"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "http_alt": {
+      "command": "check-http.rb --url http://localhost:8080",
+      "subscribers": [
+        "http_alt"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "http_alt2": {
+      "command": "check-http.rb --url http://localhost:8088",
+      "subscribers": [
+        "http_alt2"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "certificate_validity": {
+      "command": "check-https-cert.rb --url https://localhost:443 -w 14 -c 7 -k",
+      "subscribers": [
+        "https"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "certificate_validity_alt": {
+      "command": "check-https-cert.rb --url https://localhost:8443 -w 14 -c 7 -k",
+      "subscribers": [
+        "https"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "https": {
+      "command": "check-http.rb --url https://localhost:443",
+      "subscribers": [
+        "https"
+      ],
+      "handler": "slack",
+      "interval": 60
+    },
+    "https_alt": {
+      "command": "check-http.rb --url http://localhost:8443",
+      "subscribers": [
+        "https_alt"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

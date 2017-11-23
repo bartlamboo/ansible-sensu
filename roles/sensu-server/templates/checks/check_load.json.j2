@@ -1,0 +1,12 @@
+{
+  "checks": {
+    "load": {
+      "command": "check-load.rb",
+      "subscribers": [
+        "linux"
+      ],
+      "handler": "slack",
+      "interval": 60
+    }
+  }
+}

@@ -25,7 +25,7 @@
       "interval": 60
     },
     "certificate_validity": {
-      "command": "check-https-cert.rb --url https://localhost:443 -w 14 -c 7 -k",
+      "command": "check-https-cert.rb --url https://localhost:443 -w :::http.certificate.warning|14::: -c :::http.certificate.critical|7::: -k",
       "subscribers": [
         "https"
       ],
@@ -33,7 +33,7 @@
       "interval": 60
     },
     "certificate_validity_alt": {
-      "command": "check-https-cert.rb --url https://localhost:8443 -w 14 -c 7 -k",
+      "command": "check-https-cert.rb --url https://localhost:8443 -w :::http.certificate.warning|14::: -c :::http.certificate.critical|7::: -k",
       "subscribers": [
         "https"
       ],

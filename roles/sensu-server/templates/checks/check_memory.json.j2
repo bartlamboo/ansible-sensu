@@ -1,7 +1,7 @@
 {
   "checks": {
     "memory_percent": {
-      "command": "check-memory.rb -p -w 10 -c 20",
+      "command": "check-memory.rb -p -w :::memory.usedpercent.warning|80::: -c :::memory.usedpercent.critical|90:::",
       "subscribers": [
         "linux"
       ],

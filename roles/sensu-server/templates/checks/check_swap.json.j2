@@ -1,7 +1,7 @@
 {
   "checks": {
     "swap_percent": {
-      "command": "check-swap.rb -w 10 -c 20",
+      "command": "check-swap.rb -w :::swap.usedpercent.warning|80::: -c :::swap.usedpercent.critical|90:::",
       "subscribers": [
         "linux"
       ],

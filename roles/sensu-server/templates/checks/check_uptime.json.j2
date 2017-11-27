@@ -1,7 +1,7 @@
 {
   "checks": {
     "uptime": {
-      "command": "check-uptime.rb --uptime 3600",
+      "command": "check-uptime.rb --uptime :::uptime.warning|3600:::",
       "subscribers": [
         "linux"
       ],

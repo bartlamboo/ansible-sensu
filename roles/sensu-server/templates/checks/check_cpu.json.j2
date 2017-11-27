@@ -1,7 +1,7 @@
 {
   "checks": {
     "cpu_iowait": {
-      "command": "check-cpu.rb --iowait -w 10 -c 20",
+      "command": "check-cpu.rb --iowait -w :::cpu.iowait.warning|10::: -c :::cpu.iowait.critical|20:::",
       "subscribers": [
         "linux"
       ],
@@ -9,7 +9,7 @@
       "interval": 60
     },
     "cpu_system": {
-      "command": "check-cpu.rb --system -w 10 -c 20",
+      "command": "check-cpu.rb --system -w :::cpu.system.warning|10::: -c :::cpu.system.critical|20:::",
       "subscribers": [
         "linux"
       ],
@@ -17,7 +17,7 @@
       "interval": 60
     },
     "cpu_idle": {
-      "command": "check-cpu.rb --idle --less_than -w 20 -c 10",
+      "command": "check-cpu.rb --idle --less_than -w :::cpu.idle.warning|20::: -c :::cpu.idle.critical|10:::",
       "subscribers": [
         "linux"
       ],
@@ -25,7 +25,7 @@
       "interval": 60
     },
     "cpu_steal": {
-      "command": "check-cpu.rb --steal -w 1 -c 2",
+      "command": "check-cpu.rb --steal -w :::cpu.steal.warning|1::: -c :::cpu.steal.critical|2:::",
       "subscribers": [
         "linux"
       ],

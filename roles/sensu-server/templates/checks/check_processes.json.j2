@@ -1,7 +1,7 @@
 {
   "checks": {
     "processes": {
-      "command": "check-process.rb -w 500 -c 800",
+      "command": "check-process.rb -w :::processes.warning|500::: -c :::processes.critical|800:::",
       "subscribers": [
         "linux"
       ],
@@ -9,7 +9,7 @@
       "interval": 60
     },
     "threads": {
-      "command": "check-threads-count.rb  -w 800 -c 1200",
+      "command": "check-threads-count.rb  -w :::threads.warning|800::: -c :::threads.critical|1200:::",
       "subscribers": [
         "linux"
       ],

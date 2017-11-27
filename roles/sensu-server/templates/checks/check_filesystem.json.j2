@@ -1,7 +1,7 @@
 {
   "checks": {
     "filesystem_local_usage": {
-      "command": "check-disk-usage.rb -t xfs,ext2,ext3,ext4,zfs,ntfs,reiserfs,ufs,vfat -w 80 -c 90",
+      "command": "check-disk-usage.rb -t xfs,ext2,ext3,ext4,zfs,ntfs,reiserfs,ufs,vfat -w :::disk.usage.warning|80::: -c :::disk.usage.critical|90:::",
       "subscribers": [
         "linux"
       ],
@@ -9,7 +9,7 @@
       "interval": 60
     },
     "filesystem_remote_usage": {
-      "command": "check-disk-usage.rb -x xfs,ext2,ext3,ext4,zfs,ntfs,reiserfs,ufs,vfat,tmpfs,sysv,proc -w 80 -c 90",
+      "command": "check-disk-usage.rb -x xfs,ext2,ext3,ext4,zfs,ntfs,reiserfs,ufs,vfat,tmpfs,sysv,proc -w :::disk.usage.warning|80::: -c :::disk.usage.critical|90:::",
       "subscribers": [
         "linux"
       ],
